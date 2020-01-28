@@ -84,6 +84,20 @@ pd
 plot(pd,fsize=0.1,ftype="i",colors=cols,ylim=c(-2,Ntip(tree)), cex = 0.2)
 add.simmap.legend(colors=cols[2:1],prompt=FALSE,x=0,y=-4,vertical=FALSE)
 
+############################################
+# Open a PDF
+############################################
+pdffn = paste0("BSMs100_v3.pdf")
+pdf(file=pdffn, width=6, height=100)
+plot(pd,fsize=0.6,ftype="i",colors=cols,ylim=c(-2,Ntip(tree)))
+add.simmap.legend(colors=cols[2:1],prompt=FALSE,x=0,y=-4,vertical=FALSE)
+############################################
+# Close PDF
+############################################
+dev.off()
+
+
+
 
 plot(sample(mtrees,1)[[1]],cols,fsize=0.1,ftype="i",
     ylim=c(-2,Ntip(tree)))
@@ -91,10 +105,37 @@ nodelabels(pie=pd$ace,piecol=cols,cex=0.2)
 add.simmap.legend(colors=cols[2:1],prompt=FALSE,x=0,y=-4,
     vertical=FALSE)
 
+############################################
+# Open a PDF
+############################################
+pdffn = paste0("BSMs100_v4.pdf")
+pdf(file=pdffn, width=6, height=100)
+plot(sample(mtrees,1)[[1]],cols,fsize=0.6,ftype="i",
+    ylim=c(-2,Ntip(tree)))
+nodelabels(pie=pd$ace,piecol=cols,cex=0.5)
+add.simmap.legend(colors=cols[2:1],prompt=FALSE,x=0,y=-4,
+    vertical=FALSE)
+############################################
+# Close PDF
+############################################
+dev.off()
+
 
 obj<-densityMap(mtrees,states=levels(trait)[2:1],plot=FALSE)
+
 plot(obj,fsize=c(0.1,1))
 
+
+############################################
+# Open a PDF
+############################################
+pdffn = paste0("BSMs100_v5.pdf")
+pdf(file=pdffn, width=6, height=100)
+plot(obj,fsize=c(0.6,1))
+############################################
+# Close PDF
+############################################
+dev.off()
 
 
 dotTree(tree,trait,colors=cols,fsize=0.1,ftype="i",
@@ -108,6 +149,25 @@ add.simmap.legend(colors=sapply(setNames(cols[2:1],
     make.transparent,0.1),prompt=FALSE,x=50,y=-4,
     vertical=FALSE)
 
+############################################
+# Open a PDF
+############################################
+pdffn = paste0("BSMs100_v6.pdf")
+pdf(file=pdffn, width=6, height=100)
+dotTree(tree,trait,colors=cols,fsize=0.6,ftype="i",
+    legend=FALSE)
+add.simmap.legend(x=0,y=-4,colors=cols,prompt=FALSE,
+    vertical=FALSE,shape="circle")
+nulo<-sapply(mtrees,markChanges,sapply(cols,
+    make.transparent,0.1))
+add.simmap.legend(colors=sapply(setNames(cols[2:1],
+    c("C3->C4","C4->C3")),
+    make.transparent,0.1),prompt=FALSE,x=50,y=-4,
+    vertical=FALSE)
+############################################
+# Close PDF
+############################################
+dev.off()
 
 
 
