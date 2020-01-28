@@ -1,0 +1,120 @@
+---
+title: "CyperaceaeC3C4"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+```{r}
+library(ape)
+library(phytools)
+
+tree <- read.tree("tree.tree")
+data <- read.csv("mydata.csv")
+trait <- data[,4]
+names(trait) <- data[,1]
+setdiff(names(trait),tree$tip.label)
+setdiff(tree$tip.label,names(trait))
+tree <- drop.tip(tree, c("Cyperus_rubicundus","Cyperus_nemoralis"))
+results <- make.simmap(tree, trait, model="SYM", nsim=10)
+
+```
+
+Visualization
+```{r}
+
+plotTree(tree,type="fan",fsize=0.1,ftype="i",lwd=1)
+cols<-setNames(c("red","blue"),levels(trait))
+tiplabels(pie=to.matrix(trait[tree$tip.label],
+    levels(trait)),piecol=cols,cex=0.1)
+add.simmap.legend(colors=cols,prompt=FALSE,x=0.9*par()$usr[1],
+    y=0.8*par()$usr[3],fsize=0.8)
+
+```
+
+ML reconstruction
+
+```{r}
+
+
+fitER<-ace(trait,tree,model="ER",type="discrete")
+fitER
+
+plotTree(tree,type="fan",fsize=0.1,ftype="i",lwd=1)
+tiplabels(pie=to.matrix(trait[tree$tip.label],
+    levels(trait)),piecol=cols,cex=0.1)
+nodelabels(node=1:tree$Nnode+Ntip(tree),
+    pie=fitER$lik.anc,piecol=cols,cex=0.2)
+add.simmap.legend(colors=cols,prompt=FALSE,x=0.9*par()$usr[1],
+    y=0.8*par()$usr[3],fsize=0.8)
+
+
+fitARD<-ace(trait,tree,model="ARD",type="discrete")
+fitARD
+plotTree(tree,type="fan",fsize=0.1,ftype="i",lwd=1)
+tiplabels(pie=to.matrix(trait[tree$tip.label],
+    levels(trait)),piecol=cols,cex=0.1)
+nodelabels(node=1:tree$Nnode+Ntip(tree),
+    pie=fitARD$lik.anc,piecol=cols,cex=0.2)
+add.simmap.legend(colors=cols,prompt=FALSE,x=0.9*par()$usr[1],
+    y=0.8*par()$usr[3],fsize=0.8)
+
+
+```
+
+
+Stochastic mapping
+```{r}
+
+mtree<-make.simmap(tree,trait,model="ER")
+mtree
+
+plot(mtree,cols,type="fan",fsize=0.1,ftype="i")
+add.simmap.legend(colors=cols,prompt=FALSE,x=0.9*par()$usr[1],
+    y=0.8*par()$usr[3],fsize=0.8)
+
+
+mtrees<-make.simmap(tree,trait,model="ER",nsim=100)
+
+
+pd<-summary(mtrees)
+pd
+plot(pd,fsize=0.1,ftype="i",colors=cols,ylim=c(-2,Ntip(tree)), cex = 0.2)
+add.simmap.legend(colors=cols[2:1],prompt=FALSE,x=0,y=-4,vertical=FALSE)
+
+
+plot(sample(mtrees,1)[[1]],cols,fsize=0.1,ftype="i",
+    ylim=c(-2,Ntip(tree)))
+nodelabels(pie=pd$ace,piecol=cols,cex=0.2)
+add.simmap.legend(colors=cols[2:1],prompt=FALSE,x=0,y=-4,
+    vertical=FALSE)
+
+
+obj<-densityMap(mtrees,states=levels(trait)[2:1],plot=FALSE)
+plot(obj,fsize=c(0.1,1))
+
+
+
+dotTree(tree,trait,colors=cols,fsize=0.1,ftype="i",
+    legend=FALSE)
+add.simmap.legend(x=0,y=-4,colors=cols,prompt=FALSE,
+    vertical=FALSE,shape="circle")
+nulo<-sapply(mtrees,markChanges,sapply(cols,
+    make.transparent,0.1))
+add.simmap.legend(colors=sapply(setNames(cols[2:1],
+    c("C3->C4","C4->C3")),
+    make.transparent,0.1),prompt=FALSE,x=50,y=-4,
+    vertical=FALSE)
+
+
+
+
+plot(fitER$lik.anc,pd$ace,xlab="marginal ancestral states",
+    ylab="posterior probabilities from stochastic mapping",
+    pch=21,cex=1.4,bg="grey")
+lines(c(0,1),c(0,1),lty="dashed",col="red",lwd=2)
+
+```
+
